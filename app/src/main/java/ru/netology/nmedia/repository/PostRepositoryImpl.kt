@@ -159,8 +159,6 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
            return response.body() ?: throw ApiError(response.code(), response.message())
        } catch (e: IOException) {
            throw NetworkError
-       } catch (e: Exception) {
-           throw UnknownError
        }
     }
 
@@ -170,8 +168,6 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             AppAuth.getInstance().setAuth(user.id,user.token)
         } catch (e: IOException) {
             throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
         }
     }
 }

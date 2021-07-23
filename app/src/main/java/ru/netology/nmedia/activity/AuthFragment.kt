@@ -1,12 +1,16 @@
 package ru.netology.nmedia.activity
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.view.isEmpty
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentAuthBinding
@@ -32,35 +36,43 @@ class AuthFragment:Fragment() {
             false)
 
 
-
-        binding.login.requestFocus()
         binding.password.requestFocus()
+        binding.login.requestFocus()
+
 
 
 
 
         binding.entry.setOnClickListener{
 
-         val log = binding.login.toString()
-         val pass = binding.password.toString()
-            if (log.isEmpty() || log.isBlank()){
-                binding.login.hint = "Это поле не заполнено"
-                binding.loginName.setTextColor(Color.RED)
-                //Toast.makeText(this@AuthFragment,getString(R.string.empty_error), Toast.LENGTH_LONG).show()
+         val log = binding.login
+         val pass = binding.password
+            when {
+                log.isEmpty() -> {
+                    binding.login.hint = "LOGIN:*"
+                    Snackbar.make(binding.root, "Поля не заполнены", Snackbar.LENGTH_LONG).show()
+                }
+                pass.isEmpty() -> {
+                    binding.password.hint = "PASSWORD:*"
+                    Snackbar.make(binding.root, "Поля не заполнены", Snackbar.LENGTH_LONG).show()
+                }
+                else -> {
+                    viewModel.logUser(log.toString(), pass.toString())
+                    AndroidUtils.hideKeyboard(requireView())
+                    findNavController().popBackStack()
+                }
             }
-            else if (pass.isEmpty() || pass.isBlank()){
-                binding.password.hint = "Это поле не заполнено"
-                binding.passwordName.setTextColor(Color.RED)
-                //Toast.makeText(this@AuthFragment,getString(R.string.empty_error), Toast.LENGTH_LONG).show()
-            }
-            else {
-                viewModel.logUser(log, pass)
-                findNavController().popBackStack()
-                AndroidUtils.hideKeyboard(requireView())
+        }
+        viewModel.dataState.observe(viewLifecycleOwner) { state ->
+            binding.progress.isVisible = state.loading
+            if (state.error){
+                Snackbar.make(binding.root, "404 User not found", Snackbar.LENGTH_LONG).show()
             }
         }
 
-
+        viewModel.logger.observe(viewLifecycleOwner) {
+            Snackbar.make(binding.root, "404 User not found", Snackbar.LENGTH_LONG).show()
+        }
 
 return binding.root
     }
