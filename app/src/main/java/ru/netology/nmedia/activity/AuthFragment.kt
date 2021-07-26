@@ -45,14 +45,14 @@ class AuthFragment:Fragment() {
 
         binding.entry.setOnClickListener{
 
-         val log = binding.login
-         val pass = binding.password
+         val log = binding.login1.text
+         val pass = binding.password1.text
             when {
-                log.isEmpty() -> {
+               log == null || log.isBlank() || log.isEmpty()-> {
                     binding.login.hint = "LOGIN:*"
                     Snackbar.make(binding.root, "Поля не заполнены", Snackbar.LENGTH_LONG).show()
                 }
-                pass.isEmpty() -> {
+                pass == null ||pass.isBlank() || pass.isEmpty() -> {
                     binding.password.hint = "PASSWORD:*"
                     Snackbar.make(binding.root, "Поля не заполнены", Snackbar.LENGTH_LONG).show()
                 }
