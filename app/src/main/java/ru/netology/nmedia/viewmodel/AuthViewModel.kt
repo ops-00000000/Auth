@@ -3,6 +3,7 @@ package ru.netology.nmedia.viewmodel
 import android.app.Application
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.auth.AuthState
@@ -26,13 +27,13 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     val dataState: LiveData<AuthStates>
         get() = _dataState
 
- val logger = SingleLiveEvent<Unit>()
-
 fun logUser(log: String, pass: String) = viewModelScope.launch{
-    logger.value = Unit
     try {
         _dataState.value = AuthStates(loading = true)
         repository.logUser(log,pass)
+        delay(100)
+        _dataState.value = AuthStates(success = true)
+        _dataState.value = AuthStates(loading = false)
     } catch (e: IOException) {
        _dataState.value = AuthStates(error = true)
     } catch (e: Exception) {

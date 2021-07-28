@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentAuthBinding
@@ -40,7 +41,17 @@ class AuthFragment:Fragment() {
         binding.login.requestFocus()
 
 
+        viewModel.dataState.observe(viewLifecycleOwner) { state ->
+            binding.progress.isVisible = state.loading
 
+            if (state.error){
+                Snackbar.make(binding.root, "404 User not found", Snackbar.LENGTH_LONG).show()
+            }
+            else if (state.success){
+                findNavController().popBackStack()
+            }
+
+        }
 
 
         binding.entry.setOnClickListener{
@@ -59,20 +70,13 @@ class AuthFragment:Fragment() {
                 else -> {
                     viewModel.logUser(log.toString(), pass.toString())
                     AndroidUtils.hideKeyboard(requireView())
-                    findNavController().popBackStack()
+
                 }
             }
         }
-        viewModel.dataState.observe(viewLifecycleOwner) { state ->
-            binding.progress.isVisible = state.loading
-            if (state.error){
-                Snackbar.make(binding.root, "404 User not found", Snackbar.LENGTH_LONG).show()
-            }
-        }
 
-        viewModel.logger.observe(viewLifecycleOwner) {
-            Snackbar.make(binding.root, "404 User not found", Snackbar.LENGTH_LONG).show()
-        }
+
+
 
 return binding.root
     }
